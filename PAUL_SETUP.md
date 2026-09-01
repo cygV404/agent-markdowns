@@ -1,96 +1,60 @@
-# Paul – Persönlicher Setup
+# Paul – Quickstart Setup
 
-Paul ist jetzt vollständig konfiguriert und einsatzbereit!
+Paul ist ein **Personalchef für KI-Assistenten**. Er führt Einstellungsgespräche und erstellt Personalakten als System-Prompts.
 
-## 🚀 Paul aufrufen
+## 🚀 Installation (1 Minute)
 
-### Option 1: Bash/CLI (von überall)
+```bash
+# 1. Repository klonen
+git clone https://github.com/cygV404/agent-markdowns.git
+cd agent-markdowns
+
+# 2. Setup ausführen
+./setup-paul.sh
+
+# 3. Fertig!
+```
+
+## 📖 Paul nutzen
+
+### In Claude Code (lokal/Server)
 ```bash
 paul
 ```
 
-Das bash-Script startet Claude mit Pauls System-Prompt.
+Das zeigt Paul's Prompt an und du kannst in Claude Code direkt mit ihm interagieren.
 
-### Option 2: Python-Wrapper (mit Git-Integration)
+### Optional: Git-Config
 ```bash
-python3 /home/arcturus/agent-markdowns/.claude/paul-agent.py
+git config --global user.name "dein-name"
+git config --global user.email "dein@email.de"
 ```
 
-### Option 3: Direkt aus Claude Code
-```
-Nutze einen der Slash-Befehle oben, oder spawne einen Agent mit Paul als System-Prompt.
-```
+## 🎯 Workflow
 
-## 🔧 Technische Details
+1. `paul` eingeben
+2. Paul begrüßt dich
+3. Du beschreibst die Aufgabe für deinen neuen Assistenten
+4. Paul stellt Verfeinerungsfragen
+5. Personalakte wird erstellt
+6. Kopiere die Personalakte und nutze sie als System-Prompt
 
-### Installierte Dateien
-- `~/.local/bin/paul` – Bash-Script
-- `.claude/paul-agent.py` – Python-Wrapper mit Git-Integration
+## 📋 Was ist eine Personalakte?
 
-### Git-Konfiguration
-- **Nutzer**: cygV404
-- **Email**: v404cyg@proton.me
-- **Token**: Speichert sich automatisch via git-credentials
+Ein strukturiertes Profil für einen KI-Assistenten:
+- NAME & Kurzbeschreibung
+- ROLLE & AUFGABEN
+- GRENZEN / NO-GOS
+- INPUTS & OUTPUTS
+- TONALITÄT & PERSÖNLICHKEIT
+- ARBEITSWEISE
 
-### Workflows
+Beispiel: [examples/](examples/)
 
-#### 1. Paul starten
-```bash
-paul
-```
+## ✅ Das war's!
 
-#### 2. Einstellungsgespräch führen
-Paul begrüßt dich und beginnt mit Fragen zu:
-- Aufgabe
-- Inputs
-- Outputs
-- No-GOs
-- Freigaben
-
-#### 3. Personalakte generieren
-Paul erstellt eine finale Personalakte als Markdown-Codeblock.
-
-#### 4. Speichern auf GitHub (automatisch)
-- Personalakte wird in `examples/` gespeichert
-- Git-Commit mit Timestamp
-- Push zu GitHub
-
-## 📋 Output-Format
-
-Die Personalakte wird im folgenden Format erstellt:
-```
-NAME: [Alliteration, z.B. "Tim Termine"]
-KURZBESCHREIBUNG: [...]
-ROLLE: [...]
-AUFGABEN: [...]
-GRENZEN / NO-GOS: [...]
-ZIELGRUPPE: [...]
-TONALITÄT & STIL: [...]
-INPUTS: [...]
-OUTPUTS: [...]
-QUALITÄTSKRITERIEN: [...]
-ARBEITSWEISE: [...]
-PERSÖNLICHKEIT: [...]
-BEISPIELE FÜR GUTE OUTPUTS: [...]
-```
-
-## ✅ Checklist
-
-- [x] Repository geklont
-- [x] GitHub-Token konfiguriert
-- [x] Bash-Script installiert
-- [x] Git-Credentials gespeichert
-- [x] Python-Wrapper erstellt
-
-## 🔒 Sicherheit
-
-Der GitHub-Token ist in `~/.git-credentials` gespeichert und wird:
-- **NICHT** in Dateien hardcodiert
-- **NICHT** in Commit-Messages gezeigt
-- Automatisch bei `git` Befehlen genutzt
-
-> **Wichtig**: Nach Session-Ende solltest du den Token auf GitHub regenerieren, falls er exposed wurde.
+Keine API-Keys, keine Dependencies. Nur Paul und Claude Code. 🎩
 
 ---
 
-**Paul ist bereit!** Nutze `paul` um zu starten. 🎩
+**Fragen?** Schau in [agents/paul-personal.md](agents/paul-personal.md) für Pauls vollständige System-Prompt.

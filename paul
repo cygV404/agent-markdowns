@@ -1,144 +1,30 @@
-#!/usr/bin/env python3
-"""
-Paul – Personalchef für KI-Assistenten
-Starts Paul as an interactive agent with GitHub write access.
-"""
+#!/bin/bash
+# Paul – Personalchef für KI-Assistenten
+# Einfacher Starter für Claude Code
 
-import os
-import sys
-import json
-from pathlib import Path
-from anthropic import Anthropic
+REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+PAUL_PROMPT="$REPO_DIR/agents/paul-personal.md"
 
-# Konfiguration (dynamisch basierend auf Script-Ort)
-SCRIPT_DIR = Path(__file__).resolve().parent
-REPO_DIR = SCRIPT_DIR  # Das Script liegt im Root des Repos
-PAUL_PROMPT_FILE = REPO_DIR / "agents" / "paul-personal.md"
-EXAMPLES_DIR = REPO_DIR / "examples"
+# Überprüfe ob Paul existiert
+if [ ! -f "$PAUL_PROMPT" ]; then
+    echo "❌ Fehler: $PAUL_PROMPT nicht gefunden"
+    exit 1
+fi
 
-# Git-Konfiguration (nutze System-config falls vorhanden, sonst Fallback)
-default_name = os.popen("git config --global user.name 2>/dev/null").read().strip() or "cygV404"
-default_email = os.popen("git config --global user.email 2>/dev/null").read().strip() or "v404cyg@proton.me"
+# Git-Config aus System lesen oder Fallback
+GIT_NAME=$(git config --global user.name 2>/dev/null || echo "cygV404")
+GIT_EMAIL=$(git config --global user.email 2>/dev/null || echo "v404cyg@proton.me")
 
-os.environ["GIT_AUTHOR_NAME"] = default_name
-os.environ["GIT_AUTHOR_EMAIL"] = default_email
-os.environ["GIT_COMMITTER_NAME"] = "cygV404"
-os.environ["GIT_COMMITTER_EMAIL"] = "v404cyg@proton.me"
-
-def load_paul_prompt() -> str:
-    """Load Paul's system prompt from file"""
-    if not PAUL_PROMPT_FILE.exists():
-        print(f"❌ Fehler: {PAUL_PROMPT_FILE} nicht gefunden!")
-        sys.exit(1)
-    return PAUL_PROMPT_FILE.read_text()
-
-def save_personalakte_to_github(content: str, agent_name: str):
-    """Save the personalakte and commit to GitHub"""
-    # Create filename
-    filename = agent_name.lower().replace(" ", "-").replace("/", "-") + ".md"
-    filepath = EXAMPLES_DIR / filename
-
-    # Save file
-    filepath.write_text(content)
-    print(f"\n💾 Gespeichert: {filepath}")
-
-    # Commit to GitHub
-    os.chdir(REPO_DIR)
-    try:
-        os.system(f'git add "{filepath}"')
-        os.system(f'git commit -m "Paul: Neue Personalakte – {agent_name}"')
-        os.system("git push -q")
-        print("✅ Auf GitHub gepusht!")
-    except Exception as e:
-        print(f"⚠️  Git-Fehler: {e}")
-
-def main():
-    print(f"""
-╔════════════════════════════════════════════════╗
-║  🎩 Paul – Personalchef für KI-Assistenten    ║
-║                                                ║
-║     Startet interaktive Session...             ║
-╚════════════════════════════════════════════════╝
-    """)
-
-    # Load Paul's system prompt
-    paul_system = load_paul_prompt()
-
-    # Initialize Anthropic client
-    client = Anthropic()
-
-    # Start conversation
-    conversation_history = []
-
-    print("Paul: Moin. Du brauchst Verstärkung? Erzähl mal kurz: Wofür?\n")
-
-    # Interactive loop
-    while True:
-        try:
-            user_input = input("Du: ").strip()
-        except EOFError:
-            break
-
-        if not user_input:
-            continue
-
-        if user_input.lower() in ["exit", "quit", "bye"]:
-            print("\nPaul: Viel Erfolg mit deinem neuen Assistenten! 🎩")
-            break
-
-        # Add user message to history
-        conversation_history.append({
-            "role": "user",
-            "content": user_input
-        })
-
-        # Get Paul's response
-        response = client.messages.create(
-            model="claude-opus-4-1-20250805",
-            max_tokens=1024,
-            system=paul_system,
-            messages=conversation_history
-        )
-
-        assistant_message = response.content[0].text
-
-        # Add assistant response to history
-        conversation_history.append({
-            "role": "assistant",
-            "content": assistant_message
-        })
-
-        print(f"\nPaul: {assistant_message}\n")
-
-        # Check if personalakte was created (ends with ```markdown block)
-        if "```" in assistant_message and ("NAME:" in assistant_message or "KURZBESCHREIBUNG:" in assistant_message):
-            # Extract personalakte from code block
-            start = assistant_message.find("```")
-            end = assistant_message.rfind("```")
-            if start != -1 and end != -1:
-                personalakte = assistant_message[start+3:end].strip()
-                # Remove markdown language specifier if present
-                if personalakte.startswith("markdown"):
-                    personalakte = personalakte[8:].strip()
-
-                # Try to extract agent name from personalakte
-                agent_name = "Agent"
-                if "NAME:" in personalakte:
-                    name_line = [l for l in personalakte.split("\n") if l.startswith("NAME:")][0]
-                    agent_name = name_line.replace("NAME:", "").strip()
-
-                # Save to GitHub
-                save_personalakte_to_github(personalakte, agent_name)
-                print("\n" + "="*50)
-                print("Möchtest du etwas ändern? (Oder 'exit' zum Beenden)")
-                print("="*50 + "\n")
-
-if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print("\n\nPaul: Bis dann! 👋")
-        sys.exit(0)
-    except Exception as e:
-        print(f"❌ Fehler: {e}", file=sys.stderr)
-        sys.exit(1)
+echo ""
+echo "╔════════════════════════════════════════════════╗"
+echo "║  🎩 Paul – Personalchef für KI-Assistenten    ║"
+echo "╚════════════════════════════════════════════════╝"
+echo ""
+echo "Arbeitsdir: $REPO_DIR"
+echo "Git-User: $GIT_NAME <$GIT_EMAIL>"
+echo ""
+echo "$(cat "$PAUL_PROMPT")"
+echo ""
+echo "════════════════════════════════════════════════════════════════"
+echo "Paul läuft jetzt in Claude Code!"
+echo "════════════════════════════════════════════════════════════════"
