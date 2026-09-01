@@ -3,7 +3,20 @@
 
 set -e
 
-REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+# Finde das echte Git-Repo (gehe nach oben bis .git gefunden wird)
+find_repo_root() {
+    local current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    while [ "$current_dir" != "/" ]; do
+        if [ -d "$current_dir/.git" ]; then
+            echo "$current_dir"
+            return 0
+        fi
+        current_dir="$(dirname "$current_dir")"
+    done
+    echo "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+}
+
+REPO_DIR=$(find_repo_root)
 EXAMPLES_DIR="$REPO_DIR/examples"
 
 # Git-Config
@@ -44,9 +57,9 @@ if [ -z "$personalakte" ]; then
     exit 1
 fi
 
-# Speichere Datei
+# Speichere Datei (mit Escape für Backticks)
 mkdir -p "$EXAMPLES_DIR"
-echo "$personalakte" > "$filepath"
+printf '%s\n' "$personalakte" > "$filepath"
 echo ""
 echo "✅ Gespeichert: $filepath"
 
