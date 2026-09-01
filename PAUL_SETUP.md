@@ -32,12 +32,25 @@ git config --global user.email "dein@email.de"
 
 ## 🎯 Workflow
 
-1. `paul` eingeben
-2. Paul begrüßt dich
-3. Du beschreibst die Aufgabe für deinen neuen Assistenten
-4. Paul stellt Verfeinerungsfragen
-5. Personalakte wird erstellt
-6. Kopiere die Personalakte und nutze sie als System-Prompt
+### Step 1: Personalakte generieren
+```bash
+paul
+```
+1. Paul begrüßt dich
+2. Du beschreibst die Aufgabe für deinen neuen Assistenten
+3. Paul stellt Verfeinerungsfragen
+4. Personalakte wird generiert
+
+### Step 2: Automatisch auf GitHub speichern
+```bash
+paul-save
+```
+1. Gib den Agenten-Namen ein (z.B. "docker-monitor")
+2. Kopiere Pauls Personalakte und füge sie ein
+3. **Fertig!** Wird automatisch auf GitHub gespeichert
+
+### Step 3: System-Prompt nutzen
+Die gespeicherte Personalakte kannst du jetzt als System-Prompt für einen neuen Assistenten verwenden!
 
 ## 📋 Was ist eine Personalakte?
 
