@@ -14,6 +14,10 @@ PAUL_SCRIPT="$SCRIPT_DIR/paul"
 chmod +x "$PAUL_SCRIPT"
 cp "$PAUL_SCRIPT" ~/.local/bin/paul 2>/dev/null || echo "⚠️  ~/.local/bin nicht verfügbar (optional)"
 
+# 3. Agents-Verzeichnis mitkopieren
+mkdir -p ~/.local/bin/agents
+cp "$SCRIPT_DIR/agents/paul-personal.md" ~/.local/bin/agents/paul-personal.md 2>/dev/null || echo "⚠️  agents/paul-personal.md konnte nicht kopiert werden"
+
 echo "✅ Paul installiert"
 echo ""
 echo "Nutzung:"
