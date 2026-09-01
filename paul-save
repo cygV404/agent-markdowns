@@ -46,7 +46,7 @@ filepath="$EXAMPLES_DIR/$filename.md"
 # Frage 2: Personalakte einfügen
 echo ""
 echo "📋 Personalakte eingeben (Ctrl+D zum Beenden):"
-echo "   (Kopiere alles zwischen den ``` Blöcken)"
+echo "   (Kopiere alles zwischen den \`\`\` Blöcken)"
 echo ""
 
 # Lese Personalakte bis EOF
