@@ -1,0 +1,71 @@
+#!/bin/bash
+# Agent Launcher – Startet gespeicherte KI-Assistenten
+# Nutzung: agent uwe, agent docker-monitor, etc.
+
+set -e
+
+# Finde das echte Git-Repo
+find_repo_root() {
+    local current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    while [ "$current_dir" != "/" ]; do
+        if [ -d "$current_dir/.git" ]; then
+            echo "$current_dir"
+            return 0
+        fi
+        current_dir="$(dirname "$current_dir")"
+    done
+    echo "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+}
+
+REPO_DIR=$(find_repo_root)
+EXAMPLES_DIR="$REPO_DIR/examples"
+
+# Überprüfe Argumente
+if [ $# -eq 0 ]; then
+    echo "❌ Agent-Name erforderlich!"
+    echo ""
+    echo "Verfügbare Agenten:"
+    if [ -d "$EXAMPLES_DIR" ]; then
+        ls -1 "$EXAMPLES_DIR"/*.md 2>/dev/null | xargs -I {} basename {} .md | sed 's/^/  - /'
+    else
+        echo "  (keine Agenten gefunden)"
+    fi
+    echo ""
+    echo "Nutzung: agent <name>"
+    echo "Beispiel: agent uwe"
+    exit 1
+fi
+
+AGENT_NAME="$1"
+
+# Suche Personalakte
+PERSONALITY_FILE="$EXAMPLES_DIR/$AGENT_NAME.md"
+
+# Falls nicht exakt gefunden, fuzzy search
+if [ ! -f "$PERSONALITY_FILE" ]; then
+    FOUND=$(find "$EXAMPLES_DIR" -name "*$AGENT_NAME*.md" 2>/dev/null | head -1)
+    if [ -n "$FOUND" ]; then
+        PERSONALITY_FILE="$FOUND"
+    else
+        echo "❌ Agent nicht gefunden: $AGENT_NAME"
+        echo ""
+        echo "Verfügbare Agenten:"
+        ls -1 "$EXAMPLES_DIR"/*.md 2>/dev/null | xargs -I {} basename {} .md | sed 's/^/  - /'
+        exit 1
+    fi
+fi
+
+# Lese Personalakte
+SYSTEM_PROMPT=$(cat "$PERSONALITY_FILE")
+
+# Zeige Agent-Info
+echo ""
+echo "╔════════════════════════════════════════════════╗"
+echo "║  🤖 Agent: $(basename "$PERSONALITY_FILE" .md)"
+echo "║     Startet in Claude Code...                  ║"
+echo "╚════════════════════════════════════════════════╝"
+echo ""
+
+# Starte Claude mit der Personalakte
+cd "$REPO_DIR"
+exec claude --system "$SYSTEM_PROMPT"

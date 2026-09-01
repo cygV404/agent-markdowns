@@ -49,8 +49,14 @@ paul-save
 2. Kopiere Pauls Personalakte und füge sie ein
 3. **Fertig!** Wird automatisch auf GitHub gespeichert
 
-### Step 3: System-Prompt nutzen
-Die gespeicherte Personalakte kannst du jetzt als System-Prompt für einen neuen Assistenten verwenden!
+### Step 3: Agent starten
+```bash
+agent uwe              # Startet Uwe mit seiner Personalakte
+agent docker-monitor   # Startet Docker-Monitor
+agent <name>           # Startet jeden gespeicherten Agenten
+```
+
+Das war's! Der Agent läuft jetzt in Claude Code mit seiner Personalakte als System-Prompt. 🚀
 
 ## 📋 Was ist eine Personalakte?
 
