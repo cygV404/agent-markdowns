@@ -10,17 +10,20 @@ import json
 from pathlib import Path
 from datetime import datetime
 
-# Konfiguration
+# Konfiguration (dynamisch)
 REPO_DIR = Path(__file__).parent.parent
 PAUL_PROMPT = REPO_DIR / "agents" / "paul-personal.md"
 EXAMPLES_DIR = REPO_DIR / "examples"
 TEMPLATE = REPO_DIR / "templates" / "personalakte.md"
 
-# Git-Konfiguration für Commits
-os.environ["GIT_AUTHOR_NAME"] = "cygV404"
-os.environ["GIT_AUTHOR_EMAIL"] = "v404cyg@proton.me"
-os.environ["GIT_COMMITTER_NAME"] = "cygV404"
-os.environ["GIT_COMMITTER_EMAIL"] = "v404cyg@proton.me"
+# Git-Konfiguration für Commits (nutze System-config)
+default_name = os.popen("git config --global user.name 2>/dev/null").read().strip() or "cygV404"
+default_email = os.popen("git config --global user.email 2>/dev/null").read().strip() or "v404cyg@proton.me"
+
+os.environ["GIT_AUTHOR_NAME"] = default_name
+os.environ["GIT_AUTHOR_EMAIL"] = default_email
+os.environ["GIT_COMMITTER_NAME"] = default_name
+os.environ["GIT_COMMITTER_EMAIL"] = default_email
 
 def read_paul_prompt():
     """Lese Pauls System-Prompt"""

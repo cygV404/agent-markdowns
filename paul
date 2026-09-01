@@ -10,14 +10,18 @@ import json
 from pathlib import Path
 from anthropic import Anthropic
 
-# Konfiguration
-REPO_DIR = Path("/home/arcturus/agent-markdowns")
+# Konfiguration (dynamisch basierend auf Script-Ort)
+SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_DIR = SCRIPT_DIR  # Das Script liegt im Root des Repos
 PAUL_PROMPT_FILE = REPO_DIR / "agents" / "paul-personal.md"
 EXAMPLES_DIR = REPO_DIR / "examples"
 
-# Git-Konfiguration
-os.environ["GIT_AUTHOR_NAME"] = "cygV404"
-os.environ["GIT_AUTHOR_EMAIL"] = "v404cyg@proton.me"
+# Git-Konfiguration (nutze System-config falls vorhanden, sonst Fallback)
+default_name = os.popen("git config --global user.name 2>/dev/null").read().strip() or "cygV404"
+default_email = os.popen("git config --global user.email 2>/dev/null").read().strip() or "v404cyg@proton.me"
+
+os.environ["GIT_AUTHOR_NAME"] = default_name
+os.environ["GIT_AUTHOR_EMAIL"] = default_email
 os.environ["GIT_COMMITTER_NAME"] = "cygV404"
 os.environ["GIT_COMMITTER_EMAIL"] = "v404cyg@proton.me"
 
