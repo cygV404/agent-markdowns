@@ -11,16 +11,37 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 PAUL_SCRIPT="$SCRIPT_DIR/paul"
 
 # 2. Executables
-chmod +x "$PAUL_SCRIPT"
-chmod +x "$SCRIPT_DIR/paul-save"
-chmod +x "$SCRIPT_DIR/agent"
-cp "$PAUL_SCRIPT" ~/.local/bin/paul 2>/dev/null || echo "⚠️  ~/.local/bin nicht verfügbar (optional)"
-cp "$SCRIPT_DIR/paul-save" ~/.local/bin/paul-save 2>/dev/null || echo "⚠️  ~/.local/bin nicht verfügbar (optional)"
-cp "$SCRIPT_DIR/agent" ~/.local/bin/agent 2>/dev/null || echo "⚠️  ~/.local/bin nicht verfügbar (optional)"
+chmod +x "$PAUL_SCRIPT" "$SCRIPT_DIR/paul-save" "$SCRIPT_DIR/agent"
 
-# 3. Agents-Verzeichnis mitkopieren
-mkdir -p ~/.local/bin/agents
-cp "$SCRIPT_DIR/agents/paul-personal.md" ~/.local/bin/agents/paul-personal.md 2>/dev/null || echo "⚠️  agents/paul-personal.md konnte nicht kopiert werden"
+# Installiert eine Datei nach ~/.local/bin. Vorhandene Fassungen werden
+# gesichert statt kommentarlos ueberschrieben. Ist das Ziel bereits ein
+# Symlink auf genau diese Quelle, bleibt es unangetastet - sonst wuerde
+# cp die Quelldatei ueber sich selbst schreiben.
+install_bin() {
+    local src="$1"
+    local dst="$HOME/.local/bin/$(basename "$src")"
+
+    if [ -L "$dst" ] && [ "$(readlink -f "$dst")" = "$(readlink -f "$src")" ]; then
+        echo "   $(basename "$src"): Symlink aufs Repo, bleibt wie er ist"
+        return 0
+    fi
+    if [ -e "$dst" ] && ! cmp -s "$src" "$dst"; then
+        cp "$dst" "$dst.bak-$(date +%Y%m%d-%H%M%S)"
+        echo "   $(basename "$src"): vorhandene Fassung gesichert"
+    fi
+    cp "$src" "$dst" 2>/dev/null || echo "⚠️  ~/.local/bin nicht verfuegbar (optional)"
+}
+
+mkdir -p ~/.local/bin
+install_bin "$PAUL_SCRIPT"
+install_bin "$SCRIPT_DIR/paul-save"
+install_bin "$SCRIPT_DIR/agent"
+
+# 3. Personalakten mitkopieren
+# agent sucht sie in examples/ - ohne diesen Schritt findet er keine.
+mkdir -p ~/.local/bin/examples
+cp "$SCRIPT_DIR/examples/"*.md ~/.local/bin/examples/ 2>/dev/null \
+    || echo "⚠️  examples/ konnte nicht kopiert werden"
 
 echo "✅ Paul installiert"
 echo ""

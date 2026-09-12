@@ -8,11 +8,11 @@ Paul führt ein strukturiertes Einstellungsgespräch mit dem Anwender und erstel
 
 ## Struktur
 
-- `agents/paul-personal.md` – System-Prompt des Meta-Agenten Paul
+- `examples/paul.md` – System-Prompt des Meta-Agenten Paul
 - `templates/personalakte.md` – standardisiertes Ausgabeformat
 - `docs/workflow.md` – Prozess und Designprinzipien
 - `examples/beispiel-agent.md` – Beispiel einer erzeugten Personalakte
 
 ## Verwendung
 
-Der Inhalt von `agents/paul-personal.md` kann als System-Prompt für Claude bzw. einen kompatiblen Agenten verwendet werden.
+Der Inhalt von `examples/paul.md` kann als System-Prompt für Claude bzw. einen kompatiblen Agenten verwendet werden.

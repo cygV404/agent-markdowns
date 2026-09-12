@@ -76,4 +76,4 @@ Keine API-Keys, keine Dependencies. Nur Paul und Claude Code. 🎩
 
 ---
 
-**Fragen?** Schau in [agents/paul-personal.md](agents/paul-personal.md) für Pauls vollständige System-Prompt.
+**Fragen?** Schau in [examples/paul.md](examples/paul.md) für Pauls vollständige System-Prompt.
