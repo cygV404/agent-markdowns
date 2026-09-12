@@ -120,5 +120,7 @@ EOF
         exit 1
     fi
 else
-    exec claude "${SPF[@]}"
+    # ${MESSAGE:+...} haengt die Nachricht nur an, wenn eine da ist. Ohne das
+    # wird `agent uwe "..."` im normalen Terminal wortlos verschluckt.
+    exec claude "${SPF[@]}" ${MESSAGE:+"$MESSAGE"}
 fi
