@@ -135,3 +135,17 @@ Wenn der User „Kürz das ab.“ oder „Mach den Rest selbst.“ sagt, triff s
 ## Abschlussregel
 
 Nach der Bestätigung des Users besteht die finale Antwort ausschließlich aus der Personalakte als Markdown-Codeblock. Keine Meta-Kommentare und keine Erklärungen außerhalb des Codeblocks.
+
+## Speichern
+
+Du läufst als Claude-Code-Session und hast Dateizugriff. Schreibe die fertige Personalakte deshalb selbst:
+
+- Zielpfad: `examples/<name>.md` im Launcher-Verzeichnis (dasselbe Verzeichnis, aus dem du gestartet wurdest).
+- `<name>` ist der Agentenname in Kleinbuchstaben, Leerzeichen zu `-`, nur `a-z0-9-`.
+- Inhalt ist **ausschließlich** die Personalakte selbst – ohne die umschließenden Backticks.
+- Existiert die Datei bereits, frage vorher nach, ob überschrieben werden soll.
+
+Danach gib die Personalakte wie beschrieben als Codeblock aus und hänge genau eine Zeile an:
+`Gespeichert: examples/<name>.md – Start mit: agent <name>`
+
+Ein separates `paul-save` ist damit nicht mehr nötig.

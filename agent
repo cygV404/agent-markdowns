@@ -6,7 +6,11 @@ set -e
 
 # Finde das echte Git-Repo
 find_repo_root() {
-    local current_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    # BASH_SOURCE kann ein Symlink sein (z.B. ~/.local/bin/agent -> Repo).
+    # readlink -f loest ihn auf, sonst wird im Symlink-Verzeichnis gesucht.
+    local self_dir
+    self_dir="$( cd "$( dirname "$(readlink -f "${BASH_SOURCE[0]}")" )" && pwd )"
+    local current_dir="$self_dir"
     while [ "$current_dir" != "/" ]; do
         if [ -d "$current_dir/.git" ]; then
             echo "$current_dir"
@@ -14,7 +18,7 @@ find_repo_root() {
         fi
         current_dir="$(dirname "$current_dir")"
     done
-    echo "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    echo "$self_dir"
 }
 
 REPO_DIR=$(find_repo_root)
@@ -37,6 +41,8 @@ if [ $# -eq 0 ]; then
 fi
 
 AGENT_NAME="$1"
+shift
+MESSAGE="$*"
 
 # Suche Personalakte
 PERSONALITY_FILE="$EXAMPLES_DIR/$AGENT_NAME.md"
@@ -55,8 +61,37 @@ if [ ! -f "$PERSONALITY_FILE" ]; then
     fi
 fi
 
-# Lese Personalakte
-SYSTEM_PROMPT=$(cat "$PERSONALITY_FILE")
+# Personalakte wird per Datei uebergeben (nicht per argv -> nicht in `ps` sichtbar).
+# --system-prompt-file ist in --help nicht dokumentiert, existiert aber. Auf CLI-
+# Versionen ohne das Flag wird auf --system-prompt zurueckgefallen.
+# Die Probe kostet ~1,5s, daher gecacht; der Cache-Key haengt am aufgeloesten
+# claude-Pfad und invalidiert sich bei jedem CLI-Update von selbst.
+CLAUDE_BIN="$(command -v claude || echo claude)"
+VER_TAG="$(readlink -f "$CLAUDE_BIN" 2>/dev/null || echo "$CLAUDE_BIN")"
+CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/agent-launcher"
+CACHE_FILE="$CACHE_DIR/spf-$(printf '%s' "$VER_TAG" | md5sum | cut -c1-16)"
+
+if [ -r "$CACHE_FILE" ]; then
+    SPF_OK="$(cat "$CACHE_FILE")"
+else
+    if claude --system-prompt-file /dev/null --print "" 2>&1 | grep -q "unknown option"; then
+        SPF_OK=0
+    else
+        SPF_OK=1
+    fi
+    mkdir -p "$CACHE_DIR" && printf '%s' "$SPF_OK" > "$CACHE_FILE"
+fi
+
+# Abnahme des Launchers: NICHT die Antwort im Terminal pruefen. Generisches
+# Claude ohne Personalakte antwortet ebenso plausibel, der Fehler bleibt
+# unsichtbar. Geprueft wird die tatsaechliche Kommandozeile:
+#   bash -x ./agent uwe "x" < /dev/null 2>&1 | grep '^+ exec'
+# Muss --system-prompt-file zeigen, im Fallback --system-prompt.
+if [ "$SPF_OK" = "1" ]; then
+    SPF=(--system-prompt-file "$PERSONALITY_FILE")
+else
+    SPF=(--system-prompt "$(cat "$PERSONALITY_FILE")")
+fi
 
 # Zeige Agent-Info
 echo ""
@@ -68,4 +103,22 @@ echo ""
 
 # Starte Claude mit der Personalakte
 cd "$REPO_DIR"
-exec claude --system "$SYSTEM_PROMPT"
+
+# In einer bereits laufenden Claude-Code-Session (verschachtelt) ist kein
+# interaktiver Start möglich -> automatisch auf --print umschalten.
+if [ -n "$CLAUDECODE" ] || [ -n "$CLAUDE_CODE_CHILD_SESSION" ]; then
+    if [ -n "$MESSAGE" ]; then
+        exec claude --print "${SPF[@]}" "$MESSAGE"
+    elif [ ! -t 0 ] && read -r -t 0.1 FIRST_LINE; then
+        exec claude --print "${SPF[@]}" <<EOF
+$FIRST_LINE
+$(cat)
+EOF
+    else
+        echo "⚠️  Läuft verschachtelt in einer Claude-Code-Session – interaktiver Modus nicht möglich."
+        echo "   Bitte eine Nachricht mitgeben: agent $AGENT_NAME <deine Nachricht>"
+        exit 1
+    fi
+else
+    exec claude "${SPF[@]}"
+fi

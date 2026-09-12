@@ -3,7 +3,7 @@
 # Einfacher Starter für Claude Code
 
 REPO_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-PAUL_PROMPT="$REPO_DIR/agents/paul-personal.md"
+PAUL_PROMPT="$REPO_DIR/examples/paul.md"
 
 # Überprüfe ob Paul existiert
 if [ ! -f "$PAUL_PROMPT" ]; then
