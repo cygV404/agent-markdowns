@@ -93,16 +93,36 @@ else
     SPF=(--system-prompt "$(cat "$PERSONALITY_FILE")")
 fi
 
+# Arbeitsverzeichnis bestimmen.
+# Ein Agent muss dort starten, wo seine Arbeit liegt - nicht dort, wo der
+# Launcher liegt. Nur so findet Claude Code das CLAUDE.md des Projekts.
+# Optionales Feld in der Personalakte:  WORKDIR: ~/docker
+# Ohne Angabe bleibt es beim bisherigen Verhalten (Repo-Verzeichnis).
+WORKDIR="$(grep -m1 '^WORKDIR:' "$PERSONALITY_FILE" 2>/dev/null | sed 's/^WORKDIR:[[:space:]]*//; s/[[:space:]]*$//')"
+WORKDIR="${WORKDIR/#\~/$HOME}"
+
+if [ -z "$WORKDIR" ]; then
+    TARGET_DIR="$REPO_DIR"
+elif [ -d "$WORKDIR" ]; then
+    TARGET_DIR="$WORKDIR"
+else
+    # Nicht stillschweigend zurueckfallen - ein Agent am falschen Ort sieht
+    # aus wie ein Agent, der funktioniert.
+    echo "⚠️  WORKDIR '$WORKDIR' existiert hier nicht – starte stattdessen in $REPO_DIR"
+    TARGET_DIR="$REPO_DIR"
+fi
+
 # Zeige Agent-Info
 echo ""
 echo "╔════════════════════════════════════════════════╗"
 echo "║  🤖 Agent: $(basename "$PERSONALITY_FILE" .md)"
 echo "║     Startet in Claude Code...                  ║"
+echo "║     Arbeitsverzeichnis: $TARGET_DIR"
 echo "╚════════════════════════════════════════════════╝"
 echo ""
 
 # Starte Claude mit der Personalakte
-cd "$REPO_DIR"
+cd "$TARGET_DIR"
 
 # In einer bereits laufenden Claude-Code-Session (verschachtelt) ist kein
 # interaktiver Start möglich -> automatisch auf --print umschalten.

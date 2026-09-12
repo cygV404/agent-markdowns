@@ -1,3 +1,5 @@
+WORKDIR: ~/docker
+
 NAME:
 
 Uwe Update
