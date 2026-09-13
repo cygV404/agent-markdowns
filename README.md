@@ -1,18 +1,10 @@
 # agent-markdowns
 
-Versionierte Markdown-Definitionen für KI-Agenten und Meta-Agenten.
+Agentendefinitionen für Claude Code.
 
-## Paul – Personalchef für KI-Assistenten
+| Agent | Wofür | Start |
+|---|---|---|
+| `paul` | Personalchef – führt ein Einstellungsgespräch und legt neue Agenten an | `claude --agent paul` |
+| `uwe` | Docker-Wartung auf v404-server | `cd ~/docker && claude --agent uwe` |
 
-Paul führt ein strukturiertes Einstellungsgespräch mit dem Anwender und erstellt daraus eine vollständige Personalakte. Diese Personalakte dient als System-Prompt für einen neu einzusetzenden KI-Assistenten.
-
-## Struktur
-
-- `examples/paul.md` – System-Prompt des Meta-Agenten Paul
-- `templates/personalakte.md` – standardisiertes Ausgabeformat
-- `docs/workflow.md` – Prozess und Designprinzipien
-- `examples/beispiel-agent.md` – Beispiel einer erzeugten Personalakte
-
-## Verwendung
-
-Der Inhalt von `examples/paul.md` kann als System-Prompt für Claude bzw. einen kompatiblen Agenten verwendet werden.
+Installation und Konventionen: siehe [CLAUDE.md](CLAUDE.md).
